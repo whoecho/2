@@ -93,6 +93,27 @@ app.post("/users/register", async (req, res) => {
     }
   }
 });
+app.post("/users/login", async (req, res) => {
+  try {
+    const user = await axios.post(`${USERS_SERVICE_URL}/users/login`, req.body);
+    if (user.data && user.data.id) {
+      const token = jwt.sign(
+        { id: user.data.id, email: user.data.email },
+        JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      res.json({ token });
+    } else {
+      res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+});
 // Routes with Circuit Breaker
 app.get("/users/:userId", async (req, res) => {
   try {
