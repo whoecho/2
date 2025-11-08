@@ -78,6 +78,21 @@ ordersCircuit.fallback(() => ({
   error: "Orders service temporarily unavailable",
 }));
 
+app.post("/users/register", async (req, res) => {
+  try {
+    const user = await axios.post(
+      `${USERS_SERVICE_URL}/users/register`,
+      req.body
+    );
+    res.status(201).json(user.data);
+  } catch (error) {
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+});
 // Routes with Circuit Breaker
 app.get("/users/:userId", async (req, res) => {
   try {
