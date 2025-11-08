@@ -39,6 +39,16 @@ app.post("/users/register", async (req, res) => {
     .status(201)
     .json({ id: newUser.id, email: newUser.email, name: newUser.name });
 });
+app.post("/users/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = Object.values(fakeUsersDb).find((u) => u.email === email);
+  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(401).json({ error: "Invalid credentials" });
+
+  res.json({ id: user.id, email: user.email, name: user.name });
+});
 app.post("/users", (req, res) => {
   const userData = req.body;
   const userId = currentId++;
