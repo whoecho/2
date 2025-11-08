@@ -114,6 +114,9 @@ app.post("/users/login", async (req, res) => {
     }
   }
 });
+app.get("/users/me", authenticateToken, async (req, res) => {
+  res.json({ message: "Access granted", user: req.user });
+});
 // Routes with Circuit Breaker
 app.get("/users/:userId", async (req, res) => {
   try {
