@@ -22,7 +22,19 @@ const circuitOptions = {
   errorThresholdPercentage: 50, // Open circuit after 50% of requests fail
   resetTimeout: 3000, // Wait 30 seconds before trying to close the circuit
 };
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: "No token provided" });
 
+  const token = authHeader.split(" ")[1];
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+}
 // Create circuit breakers for each service
 const usersCircuit = new CircuitBreaker(async (url, options = {}) => {
   try {
